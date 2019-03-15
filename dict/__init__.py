@@ -57,11 +57,11 @@ class Dict:
 
     def __init__(self, options, args):
         message = ''
+        self.options = options
         if len(args) > 0:
             for s in args:
                 message = message + s + ' '
             self.api = self.api + quote(message.encode('utf-8'))
-            self.options = options
             self.translate()
         else:
             print('Usage: dict test')
