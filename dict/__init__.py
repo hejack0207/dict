@@ -37,19 +37,31 @@ except ImportError:
     from urllib import quote
 
 
+from optparse import OptionParser
+
+def parse_opts():
+    """parse command line options"""
+    parser = OptionParser()
+    # action="store","store_true","store_false"
+    parser.add_option("-j","--json",dest="json",
+	action="store_true",help="output as json string")
+    return parser.parse_args()
+
 class Dict:
     key = '716426270'
     keyFrom = 'wufeifei'
     api = 'http://fanyi.youdao.com/openapi.do' \
           '?keyfrom=wufeifei&key=716426270&type=data&doctype=json&version=1.1&q='
     content = None
+    options = None
 
-    def __init__(self, argv):
+    def __init__(self, options, args):
         message = ''
-        if len(argv) > 0:
-            for s in argv:
+        if len(args) > 0:
+            for s in args:
                 message = message + s + ' '
             self.api = self.api + quote(message.encode('utf-8'))
+            self.options = options
             self.translate()
         else:
             print('Usage: dict test')
@@ -57,7 +69,11 @@ class Dict:
     def translate(self):
         try:
             content = urlopen(self.api).read()
-            self.content = json.loads(content.decode('utf-8'))
+            if self.options["json"] is True:
+                print(content.decode('utf-8'))
+                return
+            else:
+                self.content = json.loads(content.decode('utf-8'))
             self.parse()
         except Exception as e:
             print('ERROR: Network or remote service error!')
@@ -140,7 +156,8 @@ class Dict:
 
 
 def main():
-    Dict(sys.argv[1:])
+    (option, args) = parse_opts()
+    Dict(option,args)
 
 
 if __name__ == '__main__':
