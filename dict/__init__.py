@@ -37,20 +37,12 @@ except ImportError:
     from urllib import quote
 
 
-#from optparse import OptionParser
 from argparse import ArgumentParser
-
-#def parse_opts():
-#    """parse command line options"""
-#    parser = OptionParser()
-#    # action="store","store_true","store_false"
-#    parser.add_option("-j","--json",dest="json",
-#	action="store_true",help="output as json string")
-#    return parser.parse_args()
 
 def parse_args():
     parser = ArgumentParser(description='')
-    parser.add_argument('-j', '--json', help='output as json string')
+    parser.add_argument('-j', '--json', action='store_true', help='output as json string')
+    parser.add_argument('word')
     return parser.parse_args(sys.argv[1:])
 
 class Dict:
@@ -64,12 +56,12 @@ class Dict:
     def __init__(self, options):
         message = ''
         self.options = options
-        print(type(self.options))
-        if len(args) > 0:
-            for s in args:
-                message = message + s + ' '
-            #self.api = self.api + quote(message.encode('utf-8'))
-            self.api = self.api + quote(message)
+        #if len(args) > 0:
+        if options.word:
+            #for s in args:
+            #    message = message + s + ' '
+            message = message + options.word
+            self.api = self.api + quote(message.encode('utf-8'))
             self.translate()
         else:
             print('Usage: dict test')
@@ -77,11 +69,8 @@ class Dict:
     def translate(self):
         try:
             content = urlopen(self.api).read()
-            #self.content = json.loads(content.decode('utf-8'))
-            self.content = json.loads(content)
-            print(self.content)
-            #print(json.dumps(self.content))
-            if self.options['json'] is True:
+            self.content = json.loads(content.decode('utf-8'))
+            if self.options.json:
                 print(json.dumps(self.content))
                 return
             else:
